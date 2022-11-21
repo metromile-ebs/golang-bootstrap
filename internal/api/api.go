@@ -12,9 +12,7 @@ type api struct {
 func Init() {
 	server := &api{
 		Engine: gin.New(),
-		Routes: []Controller{
-			&Deployments{},
-		},
+		Routes: []Controller{},
 	}
 
 	server.DefaultMiddleware()
