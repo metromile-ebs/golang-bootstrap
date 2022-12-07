@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.uber.org/zap"
 )
 
 var GraphCollection *mongo.Collection = GetCollection(DB, "graph")
@@ -34,7 +33,7 @@ func CreateRecord(c *gin.Context) {
 	}
 
 	// id := res.InsertedID
-	utils.Logger.Info("Inserted document", zap.Any("data", res))
+	// utils.Logger.Info("Inserted document", zap.Any("data", res))
 	c.IndentedJSON(http.StatusCreated, res.InsertedID)
 }
 

@@ -31,7 +31,7 @@ package datamodel
 // }
 
 type Graph struct {
-	Id         string          `json:"id"`
+	Id         uint            `json:"id"`
 	Version    uint            `json:"version"`
 	Entrypoint string          `json:"entrypoint"`
 	Nodes      map[string]UUID `json:"nodes"`

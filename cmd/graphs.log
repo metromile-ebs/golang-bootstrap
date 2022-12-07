@@ -1,0 +1,7 @@
+{"level":"info","ts":"2022-12-07T13:09:12.851-0500","caller":"utils/logger.go:26","msg":"Logger is initialized"}
+{"level":"info","ts":"2022-12-07T13:14:22.850-0500","caller":"utils/logger.go:26","msg":"Logger is initialized"}
+{"level":"info","ts":"2022-12-07T13:18:42.030-0500","caller":"utils/logger.go:26","msg":"Logger is initialized"}
+{"level":"info","ts":"2022-12-07T13:20:12.930-0500","caller":"utils/logger.go:26","msg":"Logger is initialized"}
+{"level":"info","ts":"2022-12-07T13:21:20.444-0500","caller":"utils/logger.go:26","msg":"Logger is initialized"}
+{"level":"info","ts":"2022-12-07T13:22:20.186-0500","caller":"utils/logger.go:26","msg":"Logger is initialized"}
+{"level":"info","ts":"2022-12-07T14:29:17.165-0500","caller":"utils/logger.go:26","msg":"Logger is initialized"}

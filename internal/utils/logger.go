@@ -23,4 +23,5 @@ func FileLogger() {
 	)
 
 	Logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+	Logger.Info("Logger is initialized")
 }

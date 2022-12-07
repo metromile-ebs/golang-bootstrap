@@ -33,10 +33,10 @@ const (
 	// Which instances to read from
 	readPreference = "secondaryPreferred"
 
-	// connectionStringTemplate = "mongodb://127.0.0.1:27017"
+	connectionStringTemplate = "mongodb://127.0.0.1:27017"
 
 	// connectionStringTemplate = "mongodb://%s:%s@%s/?tls=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0"
-	connectionStringTemplate = "mongodb://" + username + ":" + password + "@" + clusterEndpoint + "/?ssl=false&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0&readPreference=" + readPreference + "&retryWrites=false"
+	// connectionStringTemplate = "mongodb://" + username + ":" + password + "@" + clusterEndpoint + "/?ssl=false&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0&readPreference=" + readPreference + "&retryWrites=false"
 )
 
 func ConnectDB() *mongo.Client {
@@ -44,17 +44,17 @@ func ConnectDB() *mongo.Client {
 	connectionURI := connectionStringTemplate
 	fmt.Println("Connection uri is: " + connectionURI)
 
-	tlsConfig, err := getCustomTLSConfig(caFilePath)
-	if err != nil {
-		log.Fatalf("Failed getting TLS configuration: %v", err)
-	}
+	// tlsConfig, err := getCustomTLSConfig(caFilePath)
+	// if err != nil {
+	// 	log.Fatalf("Failed getting TLS configuration: %v", err)
+	// }
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(connectionURI).SetTLSConfig(tlsConfig))
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
-	}
+	// client, err := mongo.NewClient(options.Client().ApplyURI(connectionURI).SetTLSConfig(tlsConfig))
+	// if err != nil {
+	// 	log.Fatalf("Failed to create client: %v", err)
+	// }
 
-	// client, err := mongo.NewClient(options.Client().ApplyURI(connectionURI))
+	client, err := mongo.NewClient(options.Client().ApplyURI(connectionURI))
 	if err != nil {
 		utils.Logger.Error("Could not bind json for graph structure: " + err.Error())
 		// log.Fatalf("Failed to create client: %v", err)
