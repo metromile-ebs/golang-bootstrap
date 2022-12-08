@@ -24,8 +24,5 @@
 #   default = {
 #     "author"      = "terraform"
 #     "product"     = "streamline"
-#     "environment"   = var.environment,
-#     "namespace"     = var.namespace,
-#     "project"       = var.project
 #   }
 # }

@@ -21,5 +21,12 @@
 # resource "aws_db_subnet_group" "deployments_rds_subnet" {
 #   name       = "${var.project}-${var.namespace}-${var.environment}-subnet"
 #   subnet_ids = var.private_subnet_ids
-#   tags = var.multi_tenant_default_tags
+#   tags = merge(
+#     var.multi_tenant_default_tags,
+#     {
+#       environment   = var.environment,
+#       namespace     = var.namespace,
+#       project       = var.project
+#     }
+#   )
 # }

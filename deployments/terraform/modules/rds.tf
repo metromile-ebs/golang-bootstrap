@@ -39,5 +39,12 @@
 #   vpc_security_group_ids = var.eks_security_group_ids
 #   db_subnet_group_name   = aws_db_subnet_group.deployments_rds_subnet.name
 
-#   tags = var.multi_tenant_default_tags
+#   tags =tags = merge(
+#     var.multi_tenant_default_tags,
+#     {
+#       environment   = var.environment,
+#       namespace     = var.namespace,
+#       project       = var.project
+#     }
+#   )
 # }
