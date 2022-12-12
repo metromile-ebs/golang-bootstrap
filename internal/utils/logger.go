@@ -7,14 +7,13 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var Logger *zap.Logger
-
-func FileLogger() {
+func FileLogger() *zap.Logger {
+	var Logger *zap.Logger
 	config := zap.NewProductionEncoderConfig()
 	config.EncodeTime = zapcore.ISO8601TimeEncoder
 	fileEncoder := zapcore.NewJSONEncoder(config)
 	consoleEncoder := zapcore.NewConsoleEncoder(config)
-	logFile, _ := os.OpenFile("graphs.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, _ := os.OpenFile("../logs/graphs.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	writer := zapcore.AddSync(logFile)
 	defaultLogLevel := zapcore.DebugLevel
 	core := zapcore.NewTee(
@@ -22,6 +21,7 @@ func FileLogger() {
 		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), defaultLogLevel),
 	)
 
-	Logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+	Logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 	Logger.Info("Logger is initialized")
+	return Logger
 }

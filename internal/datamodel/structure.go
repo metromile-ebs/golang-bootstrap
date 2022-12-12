@@ -1,6 +1,7 @@
 package datamodel
 
 // {
+
 //     "id": uint,
 //     "version": uint,
 //     "entrypoint": uuid,
@@ -31,6 +32,7 @@ package datamodel
 // }
 
 type Graph struct {
+	//ID is the mongodbID (May be not required to return ever)
 	Id         uint            `json:"id"`
 	Version    uint            `json:"version"`
 	Entrypoint string          `json:"entrypoint"`

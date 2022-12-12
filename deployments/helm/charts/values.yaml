@@ -15,7 +15,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 # secrets - Uncomment to add a required secret from the secrets repo
-# secretName: ""
+secretName: "graph-mongo-db-secret"
 
 serviceAccount:
   # Specifies whether a service account should be created
