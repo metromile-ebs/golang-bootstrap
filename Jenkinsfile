@@ -1,7 +1,7 @@
 def dockerImage = null
 def configs = [
-    projectName: streamline-graph-manager,
-    namespace: common,
+    projectName: 'streamline-graph-manager',
+    namespace: 'common',
     TAG: null,
     GIT_COMMIT: null,
     workspace: ''
