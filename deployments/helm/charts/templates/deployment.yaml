@@ -55,7 +55,7 @@ spec:
             - configMapRef:
                 name: {{ .Release.Name }}-configmap
             - secretRef:
-                name: {{ .Values.secretName | quote }}
+                name: {{ .Values.streamlineDeploymentsSecretName | quote }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
