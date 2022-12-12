@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,44 +12,31 @@ import (
 )
 
 const (
-	// Path to the AWS CA file
 	caFilePath = "rds-combined-ca-bundle.pem"
 
 	// Timeout operations after N seconds
-	connectTimeout           = 5
-	queryTimeout             = 30
-	username                 = "mongo"
-	password                 = "4ZxfcI0zah5u"
-	clusterEndpoint          = "127.0.0.1:27018"
-	connectionStringTemplate = "mongodb://127.0.0.1:27017"
-	// connectionStringTemplate = "mongodb://%s:%s@%s/?connect=direct&tls=true&tlsCAFile=rds-combined-ca-bundle.pem&&tlsInsecure=true"
+	// password        = "4ZxfcI0zah5u"
+	// clusterEndpoint = "127.0.0.1:27018"
+	// clusterEndpoint = "test-docdb-please-terraform.cdhqe2ld6wv2.us-west-2.docdb.amazonaws.com:27017"
+	// connectionStringTemplate = "mongodb://127.0.0.1:27017"
+	connectionStringTemplate = "mongodb://%s:%s@%s/?connect=direct&tls=true&tlsCAFile=%s&&tlsInsecure=true"
 )
 
 func ConnectDB() *mongo.Client {
-	// envUser := os.Environ("DB_USER");
-	// os.Getenv()
-	// connectionURI := fmt.Sprintf(connectionStringTemplate, username, password, clusterEndpoint)
-	connectionURI := connectionStringTemplate
+	username := os.Getenv("GRAPH_DB_USER")
+	password := os.Getenv("GRAPH_DB_PASS")
+	clusterEndpoint := os.Getenv("GRAPH_DB_HOST")
+	connectionURI := fmt.Sprintf(connectionStringTemplate, username, password, clusterEndpoint, caFilePath)
+	// connectionURI := connectionStringTemplate
 	fmt.Println("Connection uri is: " + connectionURI + "\nFile path:" + caFilePath)
-	// utils.Logger.Info("I am logging")
-
-	// tlsConfig, err := getCustomTLSConfig(caFilePath)
-	// if err != nil {
-	// 	log.Fatalf("Failed getting TLS configuration: %v", err)
-	// }
-
-	// client, err := mongo.NewClient(options.Client().ApplyURI(connectionURI).SetTLSConfig(tlsConfig))
-	// if err != nil {
-	// 	log.Fatalf("Failed to create client: %v", err)
-	// }
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(connectionURI))
 	if err != nil {
 		// utils.Logger.Error("Could not bind json for graph structure: " + err.Error())
-		// log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	err = client.Connect(ctx)
@@ -65,31 +53,3 @@ func ConnectDB() *mongo.Client {
 	fmt.Println("Connected to DocumentDB!")
 	return client
 }
-
-// func getCustomTLSConfig(caFile string) (*tls.Config, error) {
-// 	tlsConfig := new(tls.Config)
-// 	certs, err := ioutil.ReadFile(caFile)
-
-// 	if err != nil {
-// 		return tlsConfig, err
-// 	}
-
-// 	fmt.Println(certs)
-
-// 	tlsConfig.RootCAs = x509.NewCertPool()
-// 	ok := tlsConfig.RootCAs.AppendCertsFromPEM(certs)
-
-// 	if !ok {
-// 		return tlsConfig, errors.New("Failed parsing pem file")
-// 	}
-
-// 	return tlsConfig, nil
-// }
-
-// Disconnect on failure when app is stall.
-// The service itself tried to connect it without user interaction.
-
-// func GetCollection(collectionName string) *mongo.Collection {
-// 	collection := .Database("graphservice").Collection(collectionName)
-// 	return collection
-// }
