@@ -1,5 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "HelmHelpers.fullname" . -}}
+{{- $projectName := .Values.projectName -}}
+{{- $namespace := .Values.namespace -}}
 {{- $environment := .Values.environment -}}
 {{- $svcPort := .Values.service.port -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
@@ -21,15 +23,13 @@ spec:
   tls:
     {{- range .Values.ingress.tls }}
     - hosts:
-        {{- range .hosts }}
-        - {{ . }}-{{ $environment }}.metromileai.com
-        {{- end }}
+      - {{ $projectName }}-{{ $namespace }}-{{ $environment }}.metromileai.com
       secretName: {{ .secretName }}
     {{- end }}
   {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
-    - host: {{ .host }}-{{ $environment }}.metromileai.com
+    - host: {{ $projectName }}-{{ $namespace }}-{{ $environment }}.metromileai.com
       http:
         paths:
           {{- range .paths }}
