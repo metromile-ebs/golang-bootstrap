@@ -3,7 +3,7 @@
 variable "project" {
   type = string
   description = "common aws tags"
-  default = "streamline-deployments"
+  default = "streamline-graph-manager"
 }
 
 variable "namespace" {
