@@ -3,7 +3,7 @@
 terraform {
   backend "s3" {
     bucket = "streamline-deployments"
-    key = "${var.project}-service/dev"
+    key = "streamline-graph-manager-service/dev"
     region = "us-west-2"
   }
   required_version = "1.0.7"
