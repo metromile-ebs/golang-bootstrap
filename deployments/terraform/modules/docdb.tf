@@ -6,7 +6,7 @@ variable "db_password" {
 resource "aws_docdb_cluster" "docdb" {
   cluster_identifier      = "${var.project}-${var.namespace}-${var.environment}-cluster"
   engine                  = "docdb"
-  master_username         = "${var.project}-${var.namespace}-${var.environment}-master"
+  master_username         = replace("${title(var.project)}${title(var.namespace)}${title(var.environment)}${title("master")}", "-", "")
   master_password         = var.db_password
 
   apply_immediately       = true
