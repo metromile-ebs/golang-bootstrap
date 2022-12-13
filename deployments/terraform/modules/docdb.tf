@@ -4,9 +4,9 @@ variable "db_password" {
 }
 
 resource "aws_docdb_cluster" "docdb" {
-  cluster_identifier      = "${var.projectName}-${var.namespace}-${var.environment}-cluster"
+  cluster_identifier      = "${var.project}-${var.namespace}-${var.environment}-cluster"
   engine                  = "docdb"
-  master_username         = "${var.projectName}-${var.namespace}-${var.environment}-master"
+  master_username         = "${var.project}-${var.namespace}-${var.environment}-master"
   master_password         = var.db_password
 
   apply_immediately       = true
