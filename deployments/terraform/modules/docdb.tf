@@ -30,7 +30,7 @@ resource "aws_docdb_cluster" "docdb" {
 
 resource "aws_docdb_cluster_instance" "cluster_instances" {
   count              = 1
-  identifier         = "${var.projectName}-${var.namespace}-${var.environment}-instance"
+  identifier         = "${var.project}-${var.namespace}-${var.environment}-instance"
   cluster_identifier = aws_docdb_cluster.docdb.id
   instance_class     = "db.t4g.medium"
 }
