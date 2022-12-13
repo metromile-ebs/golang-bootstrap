@@ -1,7 +1,7 @@
 # Default values for streamline-cloud-gateway.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+projectName: <<DOCKERHUB_REPO>>
 replicaCount: 1
 
 image:
@@ -83,9 +83,5 @@ ingress:
     alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-west-2:098852422051:certificate/27e0e948-854b-4d34-8089-36abb46b2d2b"
   # Subdomains are postfixed with the environment during deployment. Only pass the base subdomain
   hosts:
-    - host: <<Subdomain>>
-      paths:
+    - paths:
         - path: /
-  tls:
-    - hosts:
-      - <<Subdomain>
