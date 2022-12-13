@@ -15,7 +15,7 @@ resource "aws_docdb_cluster" "docdb" {
   skip_final_snapshot     = false
 
   availability_zones      = var.private_subnet_availability_zones
-  db_subnet_group_name    = aws_db_subnet_group.deployments_rds_subnet.name
+  db_subnet_group_name    = aws_db_subnet_group.graphs_docdb_subnet.name
   vpc_security_group_ids  = var.eks_security_group_ids
 
   tags = merge(
