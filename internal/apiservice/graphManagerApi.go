@@ -2,15 +2,16 @@ package apiservice
 
 import (
 	"context"
+	"fmt"
 	"metromile-ebs/streamline-graph-manager/internal/datamodel"
 	"metromile-ebs/streamline-graph-manager/internal/dbservice"
 	"metromile-ebs/streamline-graph-manager/internal/utils"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
 )
@@ -47,7 +48,7 @@ func getAllGraphs(graphManagerService graphManagerService) gin.HandlerFunc {
 
 		results, err := collection.Find(ctx, bson.M{})
 		if err != nil {
-			Logger.Error("No graph found .Error is:" + err.Error())
+			err = fmt.Errorf("No graph found. Error is %w\n", err)
 			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -56,8 +57,9 @@ func getAllGraphs(graphManagerService graphManagerService) gin.HandlerFunc {
 		for results.Next(ctx) {
 			var graph datamodel.Graph
 			if err = results.Decode(&graph); err != nil {
-				Logger.Error("Unable to decode results from db:" + err.Error())
+				err = fmt.Errorf("Unable to decode results from db: %w\n", err)
 				c.JSON(http.StatusInternalServerError, err.Error())
+				return
 			}
 
 			graphs = append(graphs, graph)
@@ -69,11 +71,11 @@ func getAllGraphs(graphManagerService graphManagerService) gin.HandlerFunc {
 
 func createGraph(graphManagerService graphManagerService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var graph datamodel.Graph
+		var graph map[string]interface{}
 		err := c.BindJSON(&graph)
 		if err != nil {
+			err = fmt.Errorf("Could not bind json for graph structure: %w\n", err)
 			c.IndentedJSON(http.StatusBadRequest, err.Error())
-			Logger.Error("Could not bind json for graph structure: " + err.Error())
 			return
 		}
 
@@ -81,30 +83,37 @@ func createGraph(graphManagerService graphManagerService) gin.HandlerFunc {
 		defer cancel()
 
 		collection := getCollection("graph", graphManagerService.MongoClient)
-		_, err = collection.InsertOne(ctx, graph)
+		insertResult, err := collection.InsertOne(ctx, graph)
 		if err != nil {
-			Logger.Error("Failed to insert graph: " + err.Error())
+			err = fmt.Errorf("Failed to insert graph: %w\n", err)
 			c.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
 		}
 
-		c.IndentedJSON(http.StatusCreated, graph.Id)
+		c.IndentedJSON(http.StatusCreated, insertResult.InsertedID)
 	}
 }
 
 func GetSingleGraph(graphManagerService graphManagerService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		graphId := c.Param("id")
-		intGraphId, _ := strconv.Atoi(graphId)
-		var graph datamodel.Graph
+		idParam := c.Param("id")
+		graphObjectId, err := primitive.ObjectIDFromHex(idParam)
+		if err != nil {
+			err = fmt.Errorf("could not create object id from idParam: %s. %w\n", idParam, err)
+			c.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		var graph map[string]interface{}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 		collection := getCollection("graph", graphManagerService.MongoClient)
-		// fmt.Println("Graph id is:" + graphId)
-		err := collection.FindOne(ctx, bson.M{"id": intGraphId}).Decode(&graph)
 
+		// fmt.Println("Graph id is:" + graphId)
+		err = collection.FindOne(ctx, bson.M{"_id": graphObjectId}).Decode(&graph)
 		if err != nil {
-			Logger.Info("Graph ID:" + graphId + ".Error is:" + err.Error())
+			err = fmt.Errorf("Graph ID:"+graphObjectId.String()+".Error is: %w\n", err)
 			c.IndentedJSON(http.StatusBadRequest, err.Error())
 			return
 		}
@@ -115,8 +124,15 @@ func GetSingleGraph(graphManagerService graphManagerService) gin.HandlerFunc {
 
 func UpdateSingleGraph(graphManagerService graphManagerService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		graphId, _ := strconv.Atoi(c.Param("id"))
-		var graph datamodel.Graph
+		idParam := c.Param("id")
+		graphObjectId, err := primitive.ObjectIDFromHex(idParam)
+		if err != nil {
+			err = fmt.Errorf("could not create object id from idParam: %s. %w\n", idParam, err)
+			c.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		var graph map[string]interface{}
 		if err := c.BindJSON(&graph); err != nil {
 			c.JSON(http.StatusBadRequest, err.Error())
 			return
@@ -125,22 +141,23 @@ func UpdateSingleGraph(graphManagerService graphManagerService) gin.HandlerFunc 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		collection := getCollection("graph", graphManagerService.MongoClient)
-		result, err := collection.UpdateOne(ctx, bson.M{"id": graphId}, bson.M{"$set": graph})
+		result, err := collection.UpdateOne(ctx, bson.M{"_id": graphObjectId}, bson.M{"$set": graph})
 		if err != nil {
+			err = fmt.Errorf("Could not update the requested graphId %s. Error is %w\n", graphObjectId.String(), err)
 			c.JSON(http.StatusInternalServerError, err.Error())
-			Logger.Info("Could not update the requested graphId" + strconv.Itoa(graphId) + ".Error is:" + err.Error())
 			return
 		}
 
-		var updatedGraph datamodel.Graph
+		var updatedGraph map[string]interface{}
 		if result.MatchedCount == 1 {
-			err = collection.FindOne(ctx, bson.M{"id": graphId}).Decode(&updatedGraph)
+			err = collection.FindOne(ctx, bson.M{"_id": graphObjectId}).Decode(&updatedGraph)
 			if err != nil {
-				Logger.Error("Unable to find updated graph with graph Id:" + strconv.Itoa(graphId) + ".Error is:" + err.Error())
+				err = fmt.Errorf("Unable to find updated graph with graph Id: %s. Error is %w\n", graphObjectId.String(), err)
 				c.JSON(http.StatusInternalServerError, err.Error())
 				return
 			}
 		}
+
 		c.JSON(http.StatusOK, updatedGraph)
 	}
 }
