@@ -36,6 +36,9 @@ func (g graphManagerService) Start() {
 	router.GET("/graphs/:id", GetSingleGraph(g))
 	router.PUT("/graphs/:id", UpdateSingleGraph(g))
 	router.POST("/graphs", createGraph(g))
+	router.GET("/streamline/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, "OK")
+	})
 	router.Run()
 }
 
